@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Capture</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Webcam Capture</h1>
+
+    <div class="container">
+        <div class="video-container">
+            <video id="video" autoplay></video>
+        </div>
+        <div class="controls">
+            <button id="capture-photo">Capture Photo</button>
+            <button id="record-video">Record 20s Video</button>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div class="media-output">
+            <h2>Captured Photo:</h2>
+            <img id="photo" alt="Captured Image"/>
+            <h2>Recorded Video:</h2>
+            <video id="recorded-video" controls></video>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
