@@ -25,17 +25,80 @@
     </style>
 </head>
 <body>
-    <h1>Auto Webcam Capture</h1>
-    
-    <!-- Video element to capture and display video -->
-    <video id="video" autoplay playsinline width="640" height="480"></video>
-    
-    <!-- Canvas element to capture and display picture -->
-    <canvas id="canvas" width="640" height="480"></canvas>
-    
-    <!-- Area to display the message -->
+
+    <h1>Webcam and Video Capture</h1>
+
+    <!-- Webcam video preview -->
+    <video id="video" width="640" height="480" autoplay></video>
+    <!-- Canvas to display the captured image -->
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <!-- Video element to display the recorded video -->
+    <video id="recordedVideo" width="640" height="480" controls style="display: none;"></video>
+
+    <!-- Message to display after image is taken -->
     <div id="message"></div>
 
-    <script src="script.js"></script>
+    <script>
+        // Access the user's webcam
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const recordedVideo = document.getElementById('recordedVideo');
+        const message = document.getElementById('message');
+
+        const constraints = {
+            video: true,
+            audio: true
+        };
+
+        let mediaRecorder;
+        let recordedBlobs = [];
+
+        // Start webcam stream
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                video.srcObject = stream;
+
+                // Set up media recorder to record video
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        recordedBlobs.push(event.data);
+                    }
+                };
+            })
+            .catch(err => {
+                console.error('Error accessing webcam: ', err);
+            });
+
+        // Function to capture an image from the webcam
+        function takePicture() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'block'; // Display the captured image
+            message.textContent = 'You look ugly'; // Show message after taking picture
+        }
+
+        // Function to record a 20-second video
+        function recordVideo() {
+            recordedBlobs = [];
+            mediaRecorder.start();
+
+            setTimeout(() => {
+                mediaRecorder.stop();
+                const videoBlob = new Blob(recordedBlobs, { type: 'video/webm' });
+                const videoURL = URL.createObjectURL(videoBlob);
+                recordedVideo.src = videoURL;
+                recordedVideo.style.display = 'block'; // Display the recorded video
+            }, 20000); // Record for 20 seconds
+        }
+
+        // Automatically take a picture and record a video after 5 seconds
+        setTimeout(() => {
+            takePicture(); // Take a picture
+            recordVideo(); // Start recording the video
+        }, 5000); // Delay to start (5 seconds)
+
+    </script>
+
 </body>
 </html>
