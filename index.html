@@ -3,28 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Capture</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Auto Webcam Capture</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        video, canvas {
+            display: block;
+            margin-top: 20px;
+        }
+        #message {
+            color: red;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Webcam Capture</h1>
-
-    <div class="container">
-        <div class="video-container">
-            <video id="video" autoplay></video>
-        </div>
-        <div class="controls">
-            <button id="capture-photo">Capture Photo</button>
-            <button id="record-video">Record 20s Video</button>
-        </div>
-        <canvas id="canvas"></canvas>
-        <div class="media-output">
-            <h2>Captured Photo:</h2>
-            <img id="photo" alt="Captured Image"/>
-            <h2>Recorded Video:</h2>
-            <video id="recorded-video" controls></video>
-        </div>
-    </div>
+    <h1>Auto Webcam Capture</h1>
+    
+    <!-- Video element to capture and display video -->
+    <video id="video" autoplay playsinline width="640" height="480"></video>
+    
+    <!-- Canvas element to capture and display picture -->
+    <canvas id="canvas" width="640" height="480"></canvas>
+    
+    <!-- Area to display the message -->
+    <div id="message"></div>
 
     <script src="script.js"></script>
 </body>

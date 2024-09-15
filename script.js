@@ -1,57 +1,62 @@
-// Access the webcam
+// Get references to the video, canvas, and message elements
 const video = document.getElementById('video');
-const photo = document.getElementById('photo');
-const recordedVideo = document.getElementById('recorded-video');
 const canvas = document.getElementById('canvas');
-const captureButton = document.getElementById('capture-photo');
-const recordButton = document.getElementById('record-video');
+const context = canvas.getContext('2d');
+const messageDiv = document.getElementById('message');
 
-let mediaRecorder;
-let recordedChunks = [];
-
-// Get access to the webcam stream
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+// Request access to the webcam
+navigator.mediaDevices.getUserMedia({ video: true })
     .then(stream => {
+        // Display the video stream in the video element
         video.srcObject = stream;
-
-        // Set up MediaRecorder for video
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = function(e) {
-            recordedChunks.push(e.data);
-        };
-        
-        mediaRecorder.onstop = function() {
-            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
-            recordedVideo.src = URL.createObjectURL(blob);
-            recordedChunks = [];  // Clear the recorded chunks
-        };
+        // Automatically take the picture and video after 3 seconds
+        setTimeout(captureImageAndVideo, 3000);
     })
     .catch(err => {
-        console.error('Error accessing media devices.', err);
+        console.error("Error accessing the webcam: ", err);
     });
 
-// Capture photo when button is clicked
-captureButton.addEventListener('click', () => {
-    const context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+// Function to capture an image and a 20-second video
+function captureImageAndVideo() {
+    // Capture the image and display it on the canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Display the captured image
-    const dataURL = canvas.toDataURL('image/png');
-    photo.src = dataURL;
-});
 
-// Record 20s video when button is clicked
-recordButton.addEventListener('click', () => {
-    if (mediaRecorder && mediaRecorder.state === 'inactive') {
-        mediaRecorder.start();
-        recordButton.disabled = true;  // Disable button to avoid multiple clicks
+    // Show the "You look ugly" message after capturing the picture
+    messageDiv.textContent = "You look ugly 😅";
 
-        // Stop recording after 20 seconds
-        setTimeout(() => {
-            mediaRecorder.stop();
-            recordButton.disabled = false;
-        }, 20000);
-    }
-});
+    // Start recording a 20-second video
+    recordVideo();
+}
+
+// Function to record a 20-second video
+function recordVideo() {
+    const mediaRecorder = new MediaRecorder(video.srcObject);
+    const recordedChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+        }
+    };
+
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const videoURL = URL.createObjectURL(blob);
+
+        // Create a video element to display the recorded video
+        const recordedVideo = document.createElement('video');
+        recordedVideo.controls = true;
+        recordedVideo.src = videoURL;
+        recordedVideo.width = 640;
+        recordedVideo.height = 480;
+
+        // Append the recorded video to the webpage
+        document.body.appendChild(recordedVideo);
+    };
+
+    // Start recording and stop after 20 seconds
+    mediaRecorder.start();
+    setTimeout(() => {
+        mediaRecorder.stop();
+    }, 20000); // 20 seconds
+}
